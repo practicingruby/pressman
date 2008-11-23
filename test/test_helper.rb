@@ -25,10 +25,3 @@ class Test::Unit::TestCase
  end
 
 end
-
-def describe(name, &block)
-  klass = Class.new(Test::Unit::TestCase)
-  klass.instance_eval(&block)
-end
-
-

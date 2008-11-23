@@ -1,6 +1,6 @@
 require "#{File.dirname(__FILE__)}/test_helper"
 
-describe "A Pressman board" do
+class PressmanBoardTest < Test::Unit::TestCase
   
   setup { @board = Pressman::Board.new }
   
@@ -16,7 +16,7 @@ describe "A Pressman board" do
     [0,1].each do |ri|
       row = (0..8).map { |ci| @board[ri,ci] }
       assert row.length == 9
-      assert row.all? { |e| e.color == :black }
+      assert_row_color(:black, row)
     end
   end
   
@@ -24,8 +24,12 @@ describe "A Pressman board" do
     [7,8].each do |ri|
       row = (0..8).map { |ci| @board[ri,ci] }
       assert row.length == 9
-      assert row.all? { |e| e.color == :white }
+      assert_row_color(:white, row)
     end
+  end
+  
+  def assert_row_color(color, row)
+    assert row.all? { |e| e.color == color }, "Row should have been #{color}."
   end
   
 end
