@@ -5,7 +5,7 @@ class PressmanBoardTest < Test::Unit::TestCase
   setup { @board = Pressman::Board.new }
   
   must "have a size of 9x9" do
-    assert [@board.width, @board.height], [9,9]
+    assert [@board.width, @board.height] == [9,9]
   end
   
   must "have a row major cell accessor" do
