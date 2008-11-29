@@ -2,34 +2,45 @@ require "#{File.dirname(__FILE__)}/test_helper"
 
 class PressmanBoardTest < Test::Unit::TestCase
   
-  setup { @board = Pressman::Board.new }
-  
-  must "have a size of 9x9" do
-    assert [@board.width, @board.height] == [9,9]
+  setup do
+    @board = Pressman::Board.new 
+    @board[0,0] = :black
   end
   
-  must "have a row major cell accessor" do
-    assert Pressman::Stone === @board[0,0]
+  must "have 8 rows and 8 columns" do
+    assert_equal [8,8], 
+      [Pressman::Board::ROW_COUNT, Pressman::Board::COLUMN_COUNT]
   end
   
-  must "start with black cells in the first two rows" do
-    [0,1].each do |ri|
-      row = (0..8).map { |ci| @board[ri,ci] }
-      assert row.length == 9
-      assert_row_color(:black, row)
+  must "be able to move a piece from one place on the board to another" do
+    @board.move_from([0,0], :to => [1,0])
+    
+    assert_equal nil, @board[0,0]
+    assert_equal :black, @board[1,0]
+  end
+  
+  must "throw an error when moving to a row outside of the boundaries" do
+    assert_raises(Pressman::PositionOutOfBoundsError) do
+      @board.move_from([0,0], :to => [8,0])
     end
   end
   
-  must "start with white cells in the last two rows" do
-    [7,8].each do |ri|
-      row = (0..8).map { |ci| @board[ri,ci] }
-      assert row.length == 9
-      assert_row_color(:white, row)
+  must "throw an error when moving to a column outside of the boundaries" do
+    assert_raises(Pressman::PositionOutOfBoundsError) do
+      @board.move_from([0,0], :to => [0,8])
     end
   end
   
-  def assert_row_color(color, row)
-    assert row.all? { |e| e.color == color }, "Row should have been #{color}."
+  must "not allow a piece to be moved to the same position" do
+    assert_raises(Pressman::IllegalMoveError) do
+      @board.move_from([0,0], :to => [0,0])
+    end
+  end
+  
+  must "ensure a piece is at a position before moving it" do
+    assert_raises(Pressman::IllegalMoveError) do
+      @board.move_from([1,0], :to => [1,1])
+    end
   end
   
 end
