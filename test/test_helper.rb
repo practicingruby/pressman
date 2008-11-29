@@ -1,5 +1,9 @@
 require "test/unit"
-require "#{File.dirname(__FILE__)}/../lib/pressman"
+$LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib') 
+
+require "pressman"
+require "rubygems"
+require "mocha"
 
 class Test::Unit::TestCase
 

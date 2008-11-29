@@ -1,6 +1,6 @@
 require "#{File.dirname(__FILE__)}/test_helper"
 
-class PressmanBoardTest < Test::Unit::TestCase
+class TestBoard < Test::Unit::TestCase
   
   setup do
     @board = Pressman::Board.new 
@@ -42,5 +42,35 @@ class PressmanBoardTest < Test::Unit::TestCase
       @board.move_from([1,0], :to => [1,1])
     end
   end
+  
+  must "be able to determine the path to a point along a row" do
+    actual_path = @board.path_from([5,1], :to => [5,5])
+    assert_equal [[5,2],[5,3],[5,4],[5,5]], actual_path
+    
+    actual_path = @board.path_from([5,5], :to => [5,1])
+    assert_equal [[5,4],[5,3],[5,2],[5,1]], actual_path
+  end
+  
+  must "be able to determine the path to a point along a column" do
+    actual_path = @board.path_from([1,5], :to => [5,5])
+    assert_equal [[2,5],[3,5],[4,5],[5,5]], actual_path
+    
+    actual_path = @board.path_from([5,5], :to => [1,5])
+    assert_equal [[4,5],[3,5],[2,5],[1,5]], actual_path
+  end
+  
+  must "be able to determine the path to a point along a diagonal" do
+    actual_path = @board.path_from([1,1], :to => [5,5])
+    assert_equal [[2,2],[3,3],[4,4],[5,5]], actual_path
+    
+    actual_path = @board.path_from([5,1], :to => [1,5])
+    assert_equal [[4,2],[3,3],[2,4],[1,5]], actual_path
+  end
+  
+  must "raise an error when the path is invalid" do
+    assert_raises(Pressman::InvalidPathError) do
+      @board.path_from([4,1], :to => [1,5])
+    end
+  end  
   
 end
