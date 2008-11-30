@@ -1,12 +1,20 @@
+require "yaml"
+
 module Pressman
   class Board
     
     ROW_COUNT    = 8
     COLUMN_COUNT = 8
     
+    def self.load(filename)
+      Marshal.load(File.open(filename, "rb") { |f| f.read})
+    end
+    
     def initialize
       @data = (1..ROW_COUNT).map { Array.new(COLUMN_COUNT) }
     end
+    
+    attr_reader :data
     
     def []=(*args)
       row, col, value = args.flatten
@@ -57,6 +65,18 @@ module Pressman
       end
       
       return output
+    end
+    
+    def save_as(filename)
+      File.open(filename, "wb") { |f| f << Marshal.dump(self) }
+    end
+    
+    def ==(other)
+      @data == other.data
+    end
+    
+    def to_yaml
+      @data.map { |row| row.map { |e| e && e.color } }.to_yaml
     end
       
     private

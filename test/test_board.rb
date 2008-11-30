@@ -73,4 +73,9 @@ class TestBoard < Test::Unit::TestCase
     end
   end  
   
+  must "be able to save and restore a board" do
+    @board.save_as("foo.data")
+    assert_equal @board, Pressman::Board.load("foo.data")
+  end
+  
 end
