@@ -5,10 +5,8 @@ require "yaml"
 module HttpToYaml
   class TooManyRedirects < StandardError; end
 
-  BACKEND = 'http://192.168.200.105:4567'
-
   def get(uri, redirection_limit = 10)
-    uri = URI.parse("#{BACKEND}#{uri}")
+    uri = URI.parse("#{backend}#{uri}")
     response = Net::HTTP.start(uri.host, uri.port) do |http|
       http.get(uri.path, {'Accept' => 'text/yaml'})
     end
@@ -16,7 +14,7 @@ module HttpToYaml
   end
 
   def post(uri, params = {})
-    uri = URI.parse("#{BACKEND}#{uri}")
+    uri = URI.parse("#{backend}#{uri}")
     response = Net::HTTP.start(uri.host, uri.port) do |http|
       request = Net::HTTP::Post.new(uri.path)
       request['Accept'] = 'text/yaml'
@@ -44,6 +42,12 @@ module HttpToYaml
       get response['Location'], limit - 1
     end
   end
+  
+  def backend(host=nil)
+    return @host unless host
+    @host = host
+  end
+    
 end
 
 Shoes.app :width => 520, :height => 605, :title => "Pressman" do
@@ -109,9 +113,11 @@ Shoes.app :width => 520, :height => 605, :title => "Pressman" do
     end
   end
   
+  ip = ask "Where is the game server?"
+
+  backend(ip)
   get "/new_game"
   
-  # alert "Got it! #{(r - 20) / 50}, #{(c - 20) / 50}"
   click do |button, c, r|  
     update_pieces
     toggle_cell((r - 20) / 50, (c - 20) / 50)
