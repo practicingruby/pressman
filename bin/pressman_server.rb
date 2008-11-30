@@ -2,6 +2,20 @@ require "rubygems"
 require "sinatra"
 $LOAD_PATH << "#{File.dirname(__FILE__)}/../lib"
 require "pressman"
+require "pstore"
+
+helpers do
+  def store(key=nil, val=nil)
+    @store ||= PStore.new("game.data")
+    if val
+      @store.transaction { @store[key] = val }
+    elsif key
+      @store.transaction { @store[key] }
+    else
+      @store
+    end
+  end
+end
 
 get "/new_game" do
   
@@ -18,21 +32,27 @@ get "/new_game" do
     end
   end
   
-  board.save_as("my_board.data")
+  store(:board, board)
+  store(:move, 0)
   "Welcome"
 end
 
 get "/board" do
-  send_data Pressman::Board.load("my_board.data").to_yaml, :type => "text/yaml"
+  send_data store(:board).to_yaml, :type => "text/yaml"
+end
+
+get "/move_number" do
+  send_data store(:move).to_yaml, :type => "text/yaml"
 end
 
 post "/move" do
   begin
-    board = Pressman::Board.load("my_board.data")
+    board = store.transaction { store[:board] }
     from = [params["from_row"], params["from_col"]].map { |e| Integer(e) }
     to   = [params["to_row"], params["to_col"]].map { |e| Integer(e) }
     board[from].move_to(to)
-    board.save_as("my_board.data")
+    store(:board, board)
+    store(:move, store(:move) + 1)
     "ok"
   rescue
     "fail"

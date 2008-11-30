@@ -113,6 +113,8 @@ Shoes.app :width => 520, :height => 605, :title => "Pressman" do
     end
   end
   
+  @move = 0
+  
   ip = ask "Where is the game server?"
 
   backend(ip)
@@ -130,7 +132,11 @@ Shoes.app :width => 520, :height => 605, :title => "Pressman" do
   end
   
   animate(2) do
-    update_pieces
+    new_move = get "/move_number"
+    if new_move != @move
+      @move = new_move
+      update_pieces
+    end
   end
 
 end
